@@ -6,6 +6,7 @@ TagManager:
   tags:
   - GameManager
   - Enemy
+  - EnemyAttack
   layers:
   - Default
   - TransparentFX
@@ -14,8 +15,8 @@ TagManager:
   - Water
   - UI
   - Attackable
-  - 
-  - 
+  - Player
+  - attackLayer
   - 
   - 
   - 

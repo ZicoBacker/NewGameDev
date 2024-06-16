@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
@@ -15,6 +16,8 @@ public class PlayerController : MonoBehaviour
 
     public float health = 100f;
     public float speed = 0f;
+
+    public float attackDamage = 50f;
     public float damageTaken = 10f;
     private Rigidbody2D rb;
     public Vector2 move;
@@ -25,6 +28,11 @@ public class PlayerController : MonoBehaviour
     private float objectWidth;
     private float objectHeight;
     public float boundOffset = 0.5f;
+    public GameObject playerAttack;
+
+    public bool canAttack;
+    public float attackCDN;
+    private float attackTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -38,6 +46,8 @@ public class PlayerController : MonoBehaviour
         objectWidth = transform.GetComponent<SpriteRenderer>().bounds.size.x / 2;
         objectHeight = transform.GetComponent<SpriteRenderer>().bounds.size.y / 2;
 
+        Gamemanager.instance.UpdateHealth(health);
+
     }
 
     private void FixedUpdate()
@@ -50,6 +60,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Gamemanager.instance.playerHealth.text = "hp: " + health;
         // put the movement in move.
         move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
@@ -59,13 +70,22 @@ public class PlayerController : MonoBehaviour
         // no hp I die. script die with me.
         if (health <= 0)
         {
-            anim.SetTrigger("Died");
+            Gamemanager.instance.UpdateHealth(health);
+            // rb.excludeLayers = LayerMask.GetMask("Player");
+            Destroy(rb);
+            gameObject.layer = LayerMask.GetMask("floor");
+            anim.SetTrigger("Die");
             enabled = false;
         }
 
         if (Input.GetKeyDown(KeyCode.K))
         {
             health = 0;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Attack();
         }
     }
 
@@ -125,9 +145,38 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Enemy"))
+        if (other.gameObject.CompareTag("EnemyAttack"))
         {
             health -= damageTaken;
+            Gamemanager.instance.UpdateHealth(health);
         }
+    }
+
+    void Attack()
+    {
+        // as long as no attack, we wait..
+        if (canAttack && health > 0)
+        {
+            canAttack = false;
+            Invoke("AttackCDN", attackCDN);
+            anim.SetTrigger("attack");
+        }
+
+    }
+
+    void AttackCDN()
+    {
+        canAttack = true;
+    }
+
+
+    void AttackStart()
+    {
+        playerAttack.SetActive(true);
+    }
+
+    void AttackEnd()
+    {
+        playerAttack.SetActive(false);
     }
 }
