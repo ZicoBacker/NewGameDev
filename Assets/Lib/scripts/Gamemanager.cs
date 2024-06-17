@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour
 
     private Vector3 screenBounds;
     private bool stopIt = true;
+
+    private float timer;
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -49,6 +51,12 @@ public class GameManager : MonoBehaviour
         {
             stopIt = false;
             StartCoroutine(NextWave());
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("quitting...");
+            Application.Quit();
         }
     }
 
