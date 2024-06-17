@@ -1,30 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyAttack : MonoBehaviour
 {
-    private GameObject attackArea;
-    // Start is called before the first frame update
+    private EnemyController enemy;
+
     void Start()
     {
-        attackArea = gameObject.transform.GetChild(0).gameObject;
+        enemy = gameObject.transform.parent.GetComponent<EnemyController>();
     }
-
-    // Update is called once per frame
-    void Update()
+    public void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            AudioManager.Instance.PlaySFX("metal_hit");
+            PlayerController.Instance.TakeDamage(enemy.damage);
 
-    }
-
-
-    void StartAttack()
-    {
-        attackArea.SetActive(true);
-    }
-
-    void EndAttack()
-    {
-        attackArea.SetActive(false);
+        }
     }
 }

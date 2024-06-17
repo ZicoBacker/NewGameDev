@@ -9,8 +9,6 @@ public class PlayerAttack : MonoBehaviour
     // public LayerMask attackLayer;
     // private RaycastHit2D[] hits;
 
-    private float damage;
-
     // [SerializeField] private Transform attackTransform;
     // [SerializeField] private float attackRange = 1.5f;
     // [SerializeField] private LayerMask attackableLayer;
@@ -32,17 +30,14 @@ public class PlayerAttack : MonoBehaviour
     //     }
     // }
 
-
-    void Start()
-    {
-        damage = Gamemanager.instance.player.GetComponent<PlayerController>().attackDamage;
-    }
+    // cute bug/feature to do double damage on the perfect angle. See it as adding skill to the game :)
     void OnTriggerEnter2D(Collider2D other)
     {
 
         if (other.gameObject.layer == LayerMask.NameToLayer("Attackable"))
         {
-            other.gameObject.GetComponent<EnemyController>().TakeDamage(damage);
+            AudioManager.Instance.PlaySFX("metal_hit");
+            other.gameObject.GetComponent<EnemyController>().TakeDamage(PlayerController.Instance.attackDamage);
         }
     }
 

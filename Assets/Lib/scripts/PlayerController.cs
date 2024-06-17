@@ -4,13 +4,14 @@ using TMPro;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
-using UnityEditor.Tilemaps;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
 
     //riggty ranch of empty names... some have default values though!
+
+    public static PlayerController Instance { get; private set; }
     public float horizontalInput;
     public float verticalInput;
 
@@ -34,6 +35,20 @@ public class PlayerController : MonoBehaviour
     public float attackCDN;
     private float attackTimer;
 
+
+    // player is singleton Yippie
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -45,8 +60,7 @@ public class PlayerController : MonoBehaviour
         screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
         objectWidth = transform.GetComponent<SpriteRenderer>().bounds.size.x / 2;
         objectHeight = transform.GetComponent<SpriteRenderer>().bounds.size.y / 2;
-
-        Gamemanager.instance.UpdateHealth(health);
+        GameManager.Instance.SetHealh(health);
 
     }
 
@@ -70,10 +84,10 @@ public class PlayerController : MonoBehaviour
         // no hp I die. script die with me.
         if (health <= 0)
         {
-            Gamemanager.instance.UpdateHealth(health);
             // rb.excludeLayers = LayerMask.GetMask("Player");
+            gameObject.layer = LayerMask.NameToLayer("Deathlayer");
+            AudioManager.Instance.PlaySFX("oshit");
             Destroy(rb);
-            gameObject.layer = LayerMask.GetMask("floor");
             anim.SetTrigger("Die");
             enabled = false;
         }
@@ -129,8 +143,8 @@ public class PlayerController : MonoBehaviour
     void LateUpdate()
     {
         Vector3 viewPos = transform.position;
-        viewPos.x = Mathf.Clamp(viewPos.x, screenBounds.x * -1 - objectWidth + boundOffset, screenBounds.x + objectWidth + -boundOffset);
-        viewPos.y = Mathf.Clamp(viewPos.y, screenBounds.y * -1 - objectHeight, screenBounds.y + objectHeight);
+        viewPos.x = Mathf.Clamp(viewPos.x, screenBounds.x * -1 + boundOffset, screenBounds.x + -boundOffset);
+        viewPos.y = Mathf.Clamp(viewPos.y, screenBounds.y * -1, screenBounds.y + objectHeight);
         transform.position = viewPos;
     }
 
@@ -143,20 +157,12 @@ public class PlayerController : MonoBehaviour
         GameObject.FindWithTag("GameManager").GetComponent<GameController>().LoseScreen();
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.gameObject.CompareTag("EnemyAttack"))
-        {
-            health -= damageTaken;
-            Gamemanager.instance.UpdateHealth(health);
-        }
-    }
-
     void Attack()
     {
         // as long as no attack, we wait..
         if (canAttack && health > 0)
         {
+            AudioManager.Instance.PlaySFX("weapon_woosh");
             canAttack = false;
             Invoke("AttackCDN", attackCDN);
             anim.SetTrigger("attack");
@@ -178,5 +184,11 @@ public class PlayerController : MonoBehaviour
     void AttackEnd()
     {
         playerAttack.SetActive(false);
+    }
+
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+        GameManager.Instance.SetHealh(health);
     }
 }

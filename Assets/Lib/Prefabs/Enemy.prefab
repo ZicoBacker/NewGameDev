@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7273730729501071165}
   - component: {fileID: 3711148850178298523}
+  - component: {fileID: 3434787475949600262}
   m_Layer: 8
   m_Name: attackArea
   m_TagString: EnemyAttack
@@ -67,6 +68,18 @@ CapsuleCollider2D:
   m_Offset: {x: 0.29692888, y: -0.15719736}
   m_Size: {x: 0.9820719, y: 1.2405756}
   m_Direction: 0
+--- !u!114 &3434787475949600262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 275619592141812049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 912553c4d9648474ba1770ba24dd48bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1295551684563816262
 GameObject:
   m_ObjectHideFlags: 0
@@ -81,7 +94,6 @@ GameObject:
   - component: {fileID: 5766437588252967205}
   - component: {fileID: 1138584797229084311}
   - component: {fileID: 3855385342583534368}
-  - component: {fileID: 3652152304942470555}
   m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
@@ -145,7 +157,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 543612788, guid: 1b57d9a6dbe277647b461293073a0866, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -170,12 +182,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 100
-  target: {fileID: 0}
+  damage: 10
   moveSpeed: 1
   stopRadius: 1
   attackCDN: 2
   deathParticles: {fileID: 4964532234232823783, guid: 5a4b13029c6c55a4091e20fd65ad9533, type: 3}
-  wtf: 0
+  target: {fileID: 0}
+  damagable: 1
+  playerX: 0
 --- !u!61 &5766437588252967205
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -191,14 +205,14 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 576
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 511
   m_ForceReceiveLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 511
   m_ContactCaptureLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -269,15 +283,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &3652152304942470555
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1295551684563816262}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 912553c4d9648474ba1770ba24dd48bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
