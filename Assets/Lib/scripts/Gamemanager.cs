@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int spawnEnemies = 3;
     [SerializeField] private int Enemycount;
     [SerializeField] private List<GameObject> Enemies;
+    public Canvas loseScreen;
+    public Canvas levelUp;
 
     [SerializeField] private int Enemiesleft;
     public GameObject EnemyPrefab;
@@ -24,6 +26,8 @@ public class GameManager : MonoBehaviour
 
     private Vector3 screenBounds;
     private bool stopIt = true;
+
+    public bool isRunning;
 
     private float timer;
     void Awake()
@@ -118,5 +122,10 @@ public class GameManager : MonoBehaviour
     {
         Enemies.Remove(enemy);
         Enemiesleft--;
+    }
+
+    public void LoseScreen()
+    {
+        loseScreen.gameObject.SetActive(true);
     }
 }

@@ -107,7 +107,7 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         // not moving if you and moving!
-        if ((move.x != 0 || move.y != 0))
+        if ((move.x != 0 || move.y != 0) && GameManager.Instance.isRunning)
         {
             rb.velocity = new Vector2(move.x * speed * Time.deltaTime, rb.velocity.y);
 
@@ -154,7 +154,7 @@ public class PlayerController : MonoBehaviour
         // self explanitory no?
 
         //that was before, now this is dumb. we just call lose screen lol.
-        GameObject.FindWithTag("GameManager").GetComponent<GameController>().LoseScreen();
+        GameManager.Instance.LoseScreen();
     }
 
     void Attack()
@@ -189,6 +189,7 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(float damage)
     {
         health -= damage;
+        anim.SetTrigger("Hurt");
         GameManager.Instance.SetHealh(health);
     }
 }
