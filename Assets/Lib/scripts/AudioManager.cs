@@ -41,18 +41,31 @@ public class AudioManager : MonoBehaviour
         sfxSource.Stop();
     }
 
-    public void PlayMusic()
+    public void PlayMusic(string name)
     {
+        Sound s = Array.Find(musicSounds, x => x.name == name);
 
+        if (s == null)
+        {
+            Debug.Log("non available sound");
+        }
+        else
+        {
+            musicScource.PlayOneShot(s.clip);
+        }
     }
 
-    // IEnumerator NextSong()
-    // {
+    public void PlayRandomSong()
+    {
+        string playSong = musicSounds[UnityEngine.Random.Range(0, musicSounds.Length)].name;
+        Debug.Log(playSong);
+        PlayMusic(playSong);
+    }
 
-    //     // for some reason the idea was to loop through music in order. I don't remember why.
-    //     yield return new WaitUntil(() => !musicScource.isPlaying);
-    //     string playSong = sfxSounds[UnityEngine.Random.Range(0, sfxSounds.Length)].name;
-    //     Sound s = Array.Find(sfxSounds, x => x.name == playSong);
-    //     musicScource.PlayOneShot(s.clip);
-    // }
+    public IEnumerator PlayNext()
+    {
+        yield return new WaitUntil(() => !musicScource.isPlaying);
+        PlayRandomSong();
+        StartCoroutine(PlayNext());
+    }
 }

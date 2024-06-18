@@ -10,14 +10,14 @@ public class GameManager : MonoBehaviour
 
     public TextMeshProUGUI healthText;
     public TextMeshProUGUI WaveCount;
+
+    public TextMeshProUGUI enemiesLeft;
     public static GameManager Instance { get; private set; }
 
     [SerializeField] private int WaveNumber = 1;
     [SerializeField] private int spawnEnemies = 3;
     [SerializeField] private int Enemycount;
     [SerializeField] private List<GameObject> Enemies;
-    public Canvas loseScreen;
-    public Canvas levelUp;
 
     [SerializeField] private int Enemiesleft;
     public GameObject EnemyPrefab;
@@ -27,9 +27,18 @@ public class GameManager : MonoBehaviour
     private Vector3 screenBounds;
     private bool stopIt = true;
 
-    public bool isRunning;
+    public bool isRunning = true;
+
+    public Canvas loseScreen;
+    public Canvas levelUp;
 
     private float timer;
+
+    public enum UpChoice { Speed, Damage, Heal, knockback, none };
+
+    private UpChoice upgrade = UpChoice.none;
+    private float percentage;
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -47,6 +56,7 @@ public class GameManager : MonoBehaviour
         screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
         SetWaveCount();
         SpawnWave();
+        StartCoroutine(AudioManager.Instance.PlayNext());
     }
 
     void Update()
@@ -54,7 +64,17 @@ public class GameManager : MonoBehaviour
         if (Enemiesleft == 0 && stopIt)
         {
             stopIt = false;
-            StartCoroutine(NextWave());
+
+            // on each even wave, get the option to choose an upgrade. 
+            //otherwise continue.
+            if ((WaveNumber + 1) % 2 == 0)
+            {
+                StartCoroutine(ChooseUpgrade());
+            }
+            else
+            {
+                StartCoroutine(NextWave());
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -96,6 +116,8 @@ public class GameManager : MonoBehaviour
         Enemycount = WaveNumber * spawnEnemies;
         Enemiesleft = Enemycount;
 
+        enemiesLeft.text = "Enemies left: " + Enemiesleft;
+
         StartCoroutine(SpawnEnemy(1));
         stopIt = true;
     }
@@ -122,10 +144,32 @@ public class GameManager : MonoBehaviour
     {
         Enemies.Remove(enemy);
         Enemiesleft--;
+        enemiesLeft.text = "Enemies left: " + Enemiesleft;
     }
 
     public void LoseScreen()
     {
         loseScreen.gameObject.SetActive(true);
+    }
+
+    public IEnumerator ChooseUpgrade()
+    {
+        isRunning = false;
+        levelUp.gameObject.SetActive(true);
+        // waits until you chose an upgrade.
+        yield return new WaitUntil(() => upgrade != UpChoice.none);
+        Debug.Log(percentage);
+        PlayerController.Instance.Upgrade(upgrade, percentage);
+        upgrade = UpChoice.none;
+        isRunning = true;
+        StartCoroutine(NextWave());
+
+    }
+
+    public void SetUpgrade(UpChoice choice, float incperc)
+    {
+        percentage = incperc;
+        upgrade = choice;
+        levelUp.gameObject.SetActive(false);
     }
 }

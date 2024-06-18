@@ -120,7 +120,7 @@ public class EnemyController : MonoBehaviour
     {
 
         animator.SetTrigger("Hurt");
-        TakeKb(new Vector2(3f, 0));
+        TakeKb(new Vector2(PlayerController.Instance.knockback, 0));
         health -= damage;
 
     }

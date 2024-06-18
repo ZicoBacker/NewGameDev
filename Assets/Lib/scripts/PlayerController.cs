@@ -17,24 +17,21 @@ public class PlayerController : MonoBehaviour
 
     public float health = 100f;
     public float speed = 0f;
-
     public float attackDamage = 50f;
-    public float damageTaken = 10f;
+    public float knockback = 3f;
+
     private Rigidbody2D rb;
     public Vector2 move;
     private Animator anim;
     public ParticleSystem runningParticle;
 
     private Vector2 screenBounds;
-    private float objectWidth;
-    private float objectHeight;
     public float boundOffset = 0.5f;
     public GameObject playerAttack;
 
     public bool canAttack;
     public float attackCDN;
     private float attackTimer;
-
 
     // player is singleton Yippie
     void Awake()
@@ -58,8 +55,6 @@ public class PlayerController : MonoBehaviour
 
         //alot of naming huh?
         screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
-        objectWidth = transform.GetComponent<SpriteRenderer>().bounds.size.x / 2;
-        objectHeight = transform.GetComponent<SpriteRenderer>().bounds.size.y / 2;
         GameManager.Instance.SetHealh(health);
 
     }
@@ -84,12 +79,7 @@ public class PlayerController : MonoBehaviour
         // no hp I die. script die with me.
         if (health <= 0)
         {
-            // rb.excludeLayers = LayerMask.GetMask("Player");
-            gameObject.layer = LayerMask.NameToLayer("Deathlayer");
-            AudioManager.Instance.PlaySFX("oshit");
-            Destroy(rb);
-            anim.SetTrigger("Die");
-            enabled = false;
+            Death();
         }
 
         if (Input.GetKeyDown(KeyCode.K))
@@ -144,8 +134,18 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 viewPos = transform.position;
         viewPos.x = Mathf.Clamp(viewPos.x, screenBounds.x * -1 + boundOffset, screenBounds.x + -boundOffset);
-        viewPos.y = Mathf.Clamp(viewPos.y, screenBounds.y * -1, screenBounds.y + objectHeight);
+        viewPos.y = Mathf.Clamp(viewPos.y, screenBounds.y * -1, screenBounds.y);
         transform.position = viewPos;
+    }
+
+    private void Death()
+    {
+        // rb.excludeLayers = LayerMask.GetMask("Player");
+        gameObject.layer = LayerMask.NameToLayer("Deathlayer");
+        AudioManager.Instance.PlaySFX("oshit");
+        Destroy(rb);
+        anim.SetTrigger("Die");
+        enabled = false;
     }
 
     public void Die()
@@ -191,5 +191,36 @@ public class PlayerController : MonoBehaviour
         health -= damage;
         anim.SetTrigger("Hurt");
         GameManager.Instance.SetHealh(health);
+    }
+
+    public void UpATTSpeed()
+    {
+        attackCDN -= 0.25f;
+    }
+
+    public void UpDamage()
+    {
+        attackDamage += 20;
+    }
+
+
+    public void Upgrade(GameManager.UpChoice upgrade, float percentage)
+    {
+        switch (upgrade.ToString())
+        {
+            case "Speed":
+                attackCDN *= 1f - (percentage / 100);
+                break;
+            case "Damage":
+                attackDamage *= 1f + (percentage / 100);
+                break;
+            case "Heal":
+                health += percentage;
+                GameManager.Instance.SetHealh(health);
+                break;
+            case "knockback":
+                knockback *= 1f + (percentage / 100);
+                break;
+        }
     }
 }
